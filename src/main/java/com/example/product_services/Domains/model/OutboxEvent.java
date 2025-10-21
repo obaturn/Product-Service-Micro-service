@@ -25,6 +25,14 @@ public class OutboxEvent {
 
     @Column(name = "published", nullable = false)
     private boolean published = false;
+    @Column(name="attempts", nullable=false)
+    private int attempts = 0;
+
+    @Column(name="last_error")
+    private String lastError;
+
+// getters/setters
+
 
     // Getters & Setters
     public Long getId() { return id; }
@@ -44,4 +52,9 @@ public class OutboxEvent {
 
     public boolean isPublished() { return published; }
     public void setPublished(boolean published) { this.published = published; }
+
+    public void  setAttempts(int attempts){this.attempts=attempts;}
+    public int getAttempts() { return attempts; }
+    public String getLastError() { return lastError; }
+    public void setLastError(String lastError) { this.lastError = lastError; }
 }
