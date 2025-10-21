@@ -1,19 +1,19 @@
 package com.example.product_services.Domains.model;
 
 import jakarta.persistence.*;
-
 import java.time.Instant;
 
 @Entity
 @Table(name = "outbox_event")
-public class OutBoxEvent {
+public class OutboxEvent {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "aggregate_type", nullable = false)
     private String aggregateType;
 
-    // e.g. "PRODUCT_CREATED", "PRODUCT_UPDATED", "PRODUCT_DELETED"
     @Column(name = "event_type", nullable = false)
     private String eventType;
 
@@ -26,7 +26,7 @@ public class OutBoxEvent {
     @Column(name = "published", nullable = false)
     private boolean published = false;
 
-    // getters / setters
+    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

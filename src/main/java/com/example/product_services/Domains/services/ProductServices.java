@@ -2,6 +2,7 @@ package com.example.product_services.Domains.services;
 
 import com.example.product_services.Domains.model.Product;
 import com.example.product_services.Domains.port.input.ProductUseCase;
+import com.example.product_services.Domains.port.output.OutBoxPort;
 import com.example.product_services.Domains.port.output.SavedProductPort;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +12,11 @@ import java.util.Optional;
 @Service
 public class ProductServices implements ProductUseCase {
     private final SavedProductPort savedProductPort;
+    private final OutBoxPort outBoxPort;
 
-    public ProductServices(SavedProductPort savedProductPort) {
+    public ProductServices(SavedProductPort savedProductPort , OutBoxPort outBoxPort) {
         this.savedProductPort = savedProductPort;
+        this.outBoxPort=outBoxPort;
     }
 
     @Override
@@ -22,6 +25,7 @@ public class ProductServices implements ProductUseCase {
             throw  new IllegalArgumentException("product name cannot be empty");
         }
         savedProductPort.save(product);
+        outBoxPort.saveEvent(product, "product-topic", "PRODUCT_CREATED");
 
     }
 
@@ -37,6 +41,7 @@ public class ProductServices implements ProductUseCase {
             throw new IllegalArgumentException("UnAuthorized Vendor");
         }
         savedProductPort.delete(productId);
+        outBoxPort.saveEvent(product.get(), "product-topic", "PRODUCT_DELETED");
 
     }
 

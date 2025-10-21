@@ -1,6 +1,7 @@
 package com.example.product_services;
 
 import com.example.product_services.Domains.model.Product;
+import com.example.product_services.Domains.port.output.OutBoxPort;
 import com.example.product_services.Domains.port.output.SavedProductPort;
 import com.example.product_services.Domains.services.ProductServices;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,29 +18,31 @@ class ProductServicesApplicationTests {
 
 	private SavedProductPort saved;
 	private ProductServices productServices;
-
+    private OutBoxPort outBoxPort;
 	@BeforeEach
 	void setUp() {
 		saved = mock(SavedProductPort.class);
-		productServices = new ProductServices(saved);
+        outBoxPort = mock(OutBoxPort.class);
+		productServices = new ProductServices(saved,outBoxPort);
 	}
 
-	@Test
-	void test_that_create_product_is_successful() {
-		// Arrange: create a product
-		Product pro = new Product();
-		pro.setProductName("Apple-Laptop");
-		pro.setId(1L);
-		pro.setStock(3);
-		pro.setVendorId(2L);
-		pro.setPrice(5.00);
+    @Test
+    void test_that_create_product_is_successful() {
+        Product pro = new Product();
+        pro.setProductName("Apple-Laptop");
+        pro.setId(1L);
+        pro.setStock(3);
+        pro.setVendorId(2L);
+        pro.setPrice(5.00);
+        pro.setCategory("Phone");
+        pro.setTags(List.of("Iphone","Nokia"));
+        productServices.createProduct(pro);
 
+        verify(saved, times(1)).save(pro);
+        verify(outBoxPort, times(1))
+                .saveEvent(pro, "product-topic", "PRODUCT_CREATED"); // ✅ also verify event
+    }
 
-		productServices.createProduct(pro);
-
-
-		verify(saved, times(1)).save(pro);
-	}
 	@Test
 	void test_That_Create_Product_Fails_If_Name_Is_Empty(){
 		Product pro = new Product();
@@ -60,6 +63,8 @@ class ProductServicesApplicationTests {
 		when(saved.findById(productId)).thenReturn(Optional.of(product));
 		productServices.deleteProduct(productId,vendorId);
 		verify(saved,times(1)).delete(productId);
+        verify(outBoxPort, times(1))
+                .saveEvent(product, "product-topic", "PRODUCT_DELETED");
 
 	}
 	@Test
