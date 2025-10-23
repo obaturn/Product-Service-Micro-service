@@ -9,8 +9,4 @@ public interface JpaProductRepository extends JpaRepository<Product , Long> {
     List<Product> findByVendorId(Long vendorId);
     List<Product> findByCategory(String category);
     List<Product> findByTagsContaining(String tag);
-
-
-
-
 }
