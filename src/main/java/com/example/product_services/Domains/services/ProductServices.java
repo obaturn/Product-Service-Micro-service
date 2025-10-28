@@ -4,6 +4,7 @@ import com.example.product_services.Domains.model.Product;
 import com.example.product_services.Domains.port.input.ProductUseCase;
 import com.example.product_services.Domains.port.output.OutBoxPort;
 import com.example.product_services.Domains.port.output.SavedProductPort;
+import com.example.product_services.Infrastructure.repository.Dto.ProductEvent;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,8 @@ public class ProductServices implements ProductUseCase {
             throw  new IllegalArgumentException("product name cannot be empty");
         }
         savedProductPort.save(product);
-        outBoxPort.saveEvent(product, "product-topic", "PRODUCT_CREATED");
+        ProductEvent event = buildEvent(product, "PRODUCT_CREATED");
+        outBoxPort.saveEvent(event, "product-topic", event.getEventType());
 
     }
 
@@ -44,8 +46,20 @@ public class ProductServices implements ProductUseCase {
             throw new IllegalArgumentException("UnAuthorized Vendor");
         }
         savedProductPort.delete(productId);
-        outBoxPort.saveEvent(product.get(), "product-topic", "PRODUCT_DELETED");
+        ProductEvent event = buildEvent(product.get(), "PRODUCT_DELETED");
+        outBoxPort.saveEvent(event, "product-topic", event.getEventType());
 
+    }
+    private ProductEvent buildEvent(Product product, String eventType) {
+        ProductEvent event = new ProductEvent();
+        event.setEventType(eventType);
+        event.setProductId(product.getId());
+        event.setProductName(product.getProductName());
+        event.setPrice(product.getPrice());
+        event.setVendorId(product.getVendorId());
+        event.setCategory(product.getCategory());
+        event.setTags(product.getTags());
+        return event;
     }
 
     @Override
@@ -79,7 +93,9 @@ public class ProductServices implements ProductUseCase {
         product.setStock(updatedProduct.getStock());
 
         savedProductPort.save(product);
-        outBoxPort.saveEvent(product, "product-topic", "PRODUCT_UPDATED");
+        ProductEvent event = buildEvent(product, "PRODUCT_UPDATED");
+        outBoxPort.saveEvent(event, "product-topic", event.getEventType());
+
 
     }
 
@@ -93,7 +109,8 @@ public class ProductServices implements ProductUseCase {
         }
         product.setCategory(category);
         savedProductPort.save(product);
-        outBoxPort.saveEvent(product, "product-topic", "CATEGORY_UPDATED");
+        ProductEvent event = buildEvent(product, "CATEGORY_UPDATED");
+        outBoxPort.saveEvent(event, "product-topic", event.getEventType());
     }
 
     @Override
@@ -106,7 +123,8 @@ public class ProductServices implements ProductUseCase {
         }
         product.setTags(tags);
         savedProductPort.save(product);
-        outBoxPort.saveEvent(product, "product-topic", "TAGS_UPDATED");
+        ProductEvent event = buildEvent(product, "TAGS_UPDATED");
+        outBoxPort.saveEvent(event, "product-topic", event.getEventType());
     }
 
     @Override

@@ -9,12 +9,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OutBoxPublisher {
-    private static final Logger log = LoggerFactory.getLogger(OutBoxPublisher.class);
+public class OutBoxProductPublisher {
+    private static final Logger log = LoggerFactory.getLogger(OutBoxProductPublisher.class);
     private final OutBoxRepository outboxRepository;
     private final PulsarTemplate<String> pulsarTemplate;
 
-    public OutBoxPublisher(OutBoxRepository outboxRepository, PulsarTemplate<String> pulsarTemplate) {
+    public OutBoxProductPublisher(OutBoxRepository outboxRepository, PulsarTemplate<String> pulsarTemplate) {
         this.outboxRepository = outboxRepository;
         this.pulsarTemplate = pulsarTemplate;
     }
